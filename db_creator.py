@@ -1,17 +1,18 @@
-# import sqlalchemy
+# initial database creation
+from numbers import Integral
 from sqlalchemy import ForeignKey, create_engine
 from sqlalchemy import Table, Column, Integer, String, MetaData
 
-
-engine = create_engine('sqlite:///music_shop.db', echo = True)
+engine = create_engine('sqlite:///music_shop.db', echo = False)
 meta = MetaData()
 
+# basic tables for database
 musicians = Table(
    'musicians', meta, 
    Column('musician_id', Integer, primary_key = True), 
    Column('first_name', String), 
    Column('last_name', String), 
-   Column('band_name', String), 
+   Column('band_id', Integer, ForeignKey('bands.band_id')), 
    Column('role', String), 
 )
 
@@ -30,7 +31,7 @@ songs = Table(
 
 music_records = Table(
    'music_records', meta, 
-   Column('song_id', Integer, ForeignKey('songs.song_id')), 
+   Column('music_record_id', Integer, primary_key = True), 
    Column('producer_name', String), 
    # Column('seller_name', String), 
    # Column('wholesale_price', Integer),
@@ -42,14 +43,15 @@ music_records = Table(
    # Column('number_of_unsold', Integer),
 )
 
-A = Table('sample', meta,
-   Column('musician_id', Integer, primary_key = True), 
-   Column('first_name', String), 
+music_records_songs = Table(
+   'music_records_songs', meta, 
+   Column('song_id', Integer, ForeignKey('songs.song_id')),
+   Column('music_record_id', Integer, ForeignKey('music_record.music_record_id')),
 )
 
+# connect to database and create all tables
 connect = engine.connect()
 meta.create_all(engine)
-print(engine.table_names())
 
 # insert sampels 
 insert_mus_1 = musicians.insert().values(first_name = 'Till', last_name = 'Lindemann', role = 'Vocal',  band_name = 'rammstein')
