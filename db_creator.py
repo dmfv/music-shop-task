@@ -32,6 +32,7 @@ songs = Table(
 music_records = Table(
    "music_records", meta, 
    Column("music_record_id",    Integer, primary_key = True), 
+   Column("record_name",        String,),
    Column("producer_name",      String), 
    Column("seller_name",        String), 
    Column("wholesale_price",    Integer),
@@ -77,7 +78,8 @@ connect.execute(songs.insert().values(band_id = Eisbreacher_id, name = "Eisbrech
 connect.execute(songs.insert().values(band_id = Eisbreacher_id, name = "Was ist hier los?"))
 
 # music records
-connect.execute(music_records.insert().values(producer_name     = "Motor Music",   
+connect.execute(music_records.insert().values(record_name       = "first",
+                                             producer_name      = "Motor Music",   
                                              seller_name        = "Music Shop",
                                              wholesale_price    = 10,
                                              retail_price       = 15,
@@ -87,7 +89,8 @@ connect.execute(music_records.insert().values(producer_name     = "Motor Music",
                                              sold_this_year     = 10,
                                              number_of_unsold   = 40, ))
 
-connect.execute(music_records.insert().values(producer_name     = "Motor Music",  
+connect.execute(music_records.insert().values(record_name       = "second",
+                                             producer_name      = "Motor Music",  
                                              seller_name        = "Music Shop",
                                              wholesale_price    = 21,
                                              retail_price       = 42,
@@ -97,7 +100,8 @@ connect.execute(music_records.insert().values(producer_name     = "Motor Music",
                                              sold_this_year     = 20,
                                              number_of_unsold   = 120, ))
 
-connect.execute(music_records.insert().values(producer_name     = "Nuclear Blast",    
+connect.execute(music_records.insert().values(record_name       = "third",
+                                             producer_name      = "Nuclear Blast",    
                                              seller_name        = "Nuclear Blast",
                                              wholesale_price    = 12,
                                              retail_price       = 12,
@@ -107,7 +111,8 @@ connect.execute(music_records.insert().values(producer_name     = "Nuclear Blast
                                              sold_this_year     = 10,
                                              number_of_unsold   = 90, ))
 
-connect.execute(music_records.insert().values(producer_name     = "Stockholm",    
+connect.execute(music_records.insert().values(record_name       = "fourth",
+                                             producer_name      = "Stockholm",    
                                              seller_name        = "Stockholm",
                                              wholesale_price    = 5,
                                              retail_price       = 5,
