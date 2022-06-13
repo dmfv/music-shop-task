@@ -23,18 +23,12 @@ def get_band_id(band_name, engine_connect):
     band_id = band_list[0][0]
     return band_id
 
-# функция позволяющая получить количество музыкальных произведений заданного ансамбля
-def get_band_songs_number(band_name, engine_connect):
-    band_id = get_band_id(band_name, engine_connect)
-    req = select([func.count()]).select_from(songs).where(songs.c.band_id == band_id)
-    songs_number = engine_connect.execute(req).fetchall()[0][0]
-    return songs_number
 
 # функция позволяющая выводить название всех компакт-дисков заданного ансамбля
 def get_band_music_records_names(band_name, engine_connect):
     band_id     = get_band_id(band_name, engine_connect)
     # get all songs from band
-    band_songs = connect.execute(songs.select().where(songs.c.band_id == band_id)).fetchall()        
+    band_songs = engine_connect.execute(songs.select().where(songs.c.band_id == band_id)).fetchall()        
     if len(band_songs) == 0: # check if songs existing
         return []
 
@@ -50,7 +44,7 @@ def get_band_music_records_names(band_name, engine_connect):
     music_records_band_songs_ids = set() # set because two (or more) records can have the same songs
     for song_id in band_songs_ids:
         # get all records with one song song_id
-        record_with_band_song = connect.execute(music_records_songs.select().where(music_records_songs.c.song_id == song_id)).fetchall() # get all records with band songs
+        record_with_band_song = engine_connect.execute(music_records_songs.select().where(music_records_songs.c.song_id == song_id)).fetchall() # get all records with band songs
         for record in record_with_band_song:
             if record: # if record not empty list
                 music_records_band_songs_ids.add(record[1]) # music_record_id - is second column
@@ -59,7 +53,7 @@ def get_band_music_records_names(band_name, engine_connect):
 
     name_of_band_records = []
     for record_id in music_records_band_songs_ids:
-        band_records_names = connect.execute(music_records.select().where(music_records.c.music_record_id == record_id)).fetchall()         # get all songs from band
+        band_records_names = engine_connect.execute(music_records.select().where(music_records.c.music_record_id == record_id)).fetchall()         # get all songs from band
         if band_records_names: # if not empty list
             name_of_band_records.append(band_records_names[0][1])
 
@@ -70,14 +64,14 @@ def get_band_music_records_names(band_name, engine_connect):
 # компакт-дисков, которые чаще всего покупали в текущем
 # году
 def get_top_three_seller_records(engine_connect):
-    records = connect.execute(music_records.select().order_by(desc(music_records.c.sold_this_year))).fetchall()
+    records = engine_connect.execute(music_records.select().order_by(desc(music_records.c.sold_this_year))).fetchall()
     if len(records) == 0: # if there are no records in table
         return []
     top_seller_records_names = []
     for index in range(3):
         top_seller_records_names.append(records[index][1])
     return top_seller_records_names
-        
+
 
 # функция позволяющая вносить изменения данных о компакт-дисках и ввод
 # новых данных
