@@ -1,7 +1,7 @@
 # file to load data from sqlite file and provide some interfaces 
 
 from sqlalchemy import ForeignKey, create_engine
-from sqlalchemy import Table, Column, Integer, String, MetaData, func, select
+from sqlalchemy import Table, Column, Integer, String, MetaData, func, select, desc
 
 # connect to existing database
 engine = create_engine('sqlite:///music_shop.db', echo = False)
@@ -69,6 +69,15 @@ def get_band_music_records_names(band_name, engine_connect):
 # функция позволяющая показать лидеров продаж текущего года, то есть названия
 # компакт-дисков, которые чаще всего покупали в текущем
 # году
+def get_top_three_seller_records(engine_connect):
+    records = connect.execute(music_records.select().order_by(desc(music_records.c.sold_this_year))).fetchall()
+    if len(records) == 0: # if there are no records in table
+        return []
+    top_seller_records_names = []
+    for index in range(3):
+        top_seller_records_names.append(records[index][1])
+    return top_seller_records_names
+        
 
 # функция позволяющая вносить изменения данных о компакт-дисках и ввод
 # новых данных
