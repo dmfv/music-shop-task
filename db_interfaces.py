@@ -1,10 +1,10 @@
 # file to load data from sqlite file and provide some interfaces 
 
-from sqlalchemy import ForeignKey, create_engine
-from sqlalchemy import Table, Column, Integer, String, MetaData, func, select, desc
+from sqlalchemy import (Column, MetaData, Table, Integer, String, create_engine, desc, func,
+                        select, update, values)
 
 # connect to existing database
-engine = create_engine('sqlite:///music_shop.db', echo = False)
+engine = create_engine("sqlite:///music_shop.db", echo = False)
 meta = MetaData(engine)
 
 # load data from tables
@@ -23,6 +23,12 @@ def get_band_id(band_name, engine_connect):
     band_id = band_list[0][0]
     return band_id
 
+# функция позволяющая получить количество музыкальных произведений заданного ансамбля
+def get_band_songs_number(band_name, engine_connect):
+    band_id = get_band_id(band_name, engine_connect)
+    req = select([func.count()]).select_from(songs).where(songs.c.band_id == band_id)
+    songs_number = engine_connect.execute(req).fetchall()[0][0]
+    return songs_number
 
 # функция позволяющая выводить название всех компакт-дисков заданного ансамбля
 def get_band_music_records_names(band_name, engine_connect):
@@ -62,7 +68,7 @@ def get_band_music_records_names(band_name, engine_connect):
 
 # функция позволяющая показать лидеров продаж текущего года, то есть названия
 # компакт-дисков, которые чаще всего покупали в текущем
-# году
+# году  
 def get_top_three_seller_records(engine_connect):
     records = engine_connect.execute(music_records.select().order_by(desc(music_records.c.sold_this_year))).fetchall()
     if len(records) == 0: # if there are no records in table
@@ -75,6 +81,36 @@ def get_top_three_seller_records(engine_connect):
 
 # функция позволяющая вносить изменения данных о компакт-дисках и ввод
 # новых данных
+# def update_table_value(table, column_to_find, value_to_find, column_to_update, value_to_update, engine_connect):
+    # engine_connect.execute(update(table).where(column_to_find == value_to_find).values(column_name_to_update = value_to_update))
+def update_table_value(table_name, column_name, column_value, column_value_type, column_name_filter, column_value_filter, column_value_filter_type, engine_connect):
+    if "string" in column_value_type.lower():
+        column_value = str("'") + str(column_value) + str("'")
+    if "string" in column_value_filter_type.lower():
+        column_value_filter = str("'") + str(column_value_filter) + str("'")
+    engine_connect.execute("UPDATE %s SET %s = %s WHERE %s = %s" % (table_name, column_name, column_value, column_name_filter, column_value_filter))
+
+def add_column(table_name, column, engine):
+    column_name = column.compile(dialect = engine.dialect)
+    column_type = column.type.compile(engine.dialect)
+    engine.execute("ALTER TABLE %s ADD COLUMN %s %s" % (table_name, column_name, column_type))
+
 
 # функция позволяющая предусмотреть вводить новые данных об ансамблях 
 # (добавлять новые ансамбли можно и так через обычный insert)
+
+# точно также можно добавить add_column и затем аналогичная функция update_table_value
+
+###############################################################################################
+# examples
+
+# print(get_band_songs_number("Rammstein", connect))
+# print(get_band_music_records_names("Pain", connect))
+
+# print(get_top_three_seller_records(connect))
+
+# update_table_value("music_records", "seller_name", "TOP asdasd", "String", "record_name", "first", "String", connect)
+# connect.execute(update(music_records).where(music_records.c.record_name == "first").values(seller_name = "123")) # another way to do upper string
+
+# column = Column("new_column_name", String(100), primary_key=True)
+# add_column("music_records", column, engine)
